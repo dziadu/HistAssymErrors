@@ -1,0 +1,4 @@
+[Project]
+Name=H2AsymmErrors
+Manager=KDevCMakeManager
+VersionControl=kdevgit
