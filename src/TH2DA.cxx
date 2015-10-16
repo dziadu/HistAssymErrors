@@ -21,6 +21,7 @@
 
 #include <TEfficiency.h>
 #include <TF1.h>
+#include <TGraphAsymmErrors.h>
 #include <TMath.h>
 
 #include <iostream>
@@ -162,7 +163,7 @@ void TH2DA::PrintErrors()
 	printf("\t");
 	for (int i = 1; i <= xnum; ++i)
 	{
-		printf("%d\t", i-1);
+		printf("%10d\t", i-1);
 	}
 	printf("\n\n");
 
@@ -913,4 +914,81 @@ Double_t TH2DA::GetTotalError(const TArrayD& arr) const
 	}
 
 	return TMath::Sqrt(total_err);
+}
+
+TGraphAsymmErrors * TH2DA::BuildAsymmErrorsGraph(Size_t points, Double_t* x, Double_t* xe, Double_t* y, Double_t* yl, Double_t* yu) const
+{
+	TGraphAsymmErrors * graph = new TGraphAsymmErrors(points);
+
+	for (int i = 0; i < points; ++i)
+	{
+		graph->SetPoint(i, x[i], y[i]);
+		graph->SetPointError(i, xe[i], xe[i], yl[i], yu[i]);
+	}
+
+	return graph;
+}
+
+TGraphAsymmErrors * TH2DA::GetAsymErrorsGraphX(int xcol) const
+{PR(xcol);
+	TAxis * ax = this->GetYaxis();
+	int ynum = ax->GetNbins();
+
+	Double_t * x = new Double_t[ynum];
+	Double_t * xe = new Double_t[ynum];
+	Double_t * y = new Double_t[ynum];
+	Double_t * yu = new Double_t[ynum];
+	Double_t * yl = new Double_t[ynum];
+
+	for (int i = 0; i < ynum; ++i)
+	{
+		Int_t bin = GetBin(xcol+1, i+1);
+		x[i] = ax->GetBinCenter(i+1);
+		xe[i] = ax->GetBinWidth(i+1)/2.0;
+		y[i] = GetBinContent(bin);
+		yu[i] = GetBinErrorU(bin);
+		yl[i] = GetBinErrorL(bin);
+	}
+
+	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(ynum, x, xe, y, yl, yu);
+
+	delete [] x;
+	delete [] xe;
+	delete [] y;
+	delete [] yu;
+	delete [] yl;
+
+	return graph;
+}
+
+TGraphAsymmErrors * TH2DA::GetAsymErrorsGraphY(int yrow) const
+{
+	TAxis * ax = this->GetXaxis();
+	int xnum = ax->GetNbins();
+
+	Double_t * x = new Double_t[xnum];
+	Double_t * xe = new Double_t[xnum];
+	Double_t * y = new Double_t[xnum];
+	Double_t * yu = new Double_t[xnum];
+	Double_t * yl = new Double_t[xnum];
+
+	for (int i = 0; i < xnum; ++i)
+	{
+		Int_t bin = GetBin(i+1, yrow+1);
+		x[i] = ax->GetBinCenter(i+1);
+		xe[i] = ax->GetBinWidth(i+1)/2.0;
+		y[i] = GetBinContent(bin);
+		yu[i] = GetBinErrorU(bin);
+		yl[i] = GetBinErrorL(bin);
+	}
+
+	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(xnum, x, xe, y, yl, yu);
+
+	delete [] x;
+	delete [] xe;
+	delete [] y;
+	delete [] yu;
+	delete [] yl;
+
+	return graph;
 }

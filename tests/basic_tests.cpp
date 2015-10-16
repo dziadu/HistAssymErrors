@@ -4,6 +4,7 @@
 #include <TROOT.h>
 #include <TF2.h>
 #include <TFile.h>
+#include <TGraphAsymmErrors.h>
 
 #include <TH2DA.h>
 
@@ -156,17 +157,21 @@ void BasicCase::MyTest()
 // 	h4->PrintErrors();
 
 	TH2DA * h5 = TH2DA::Efficiency("h5_eff", h3, h4);
-	h5->PrintErrors();
+// 	h5->PrintErrors();
 
-	PR(h5->GetTotalErrorU());
-	PR(h5->Integral());
-	PR(h5->GetTotalErrorL());
+// 	PR(h5->GetTotalErrorU());
+// 	PR(h5->Integral());
+// 	PR(h5->GetTotalErrorL());
+
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( (h5->GetTotalErrorU() - h5->GetTotalErrorL()) == 0.0, false, 0.0005 );
 
 // 	TFile * f = new TFile("/tmp/test.root", "RECREATE");
 // 	if (f->IsOpen())
 // 	{
 // 		f->cd();
 // 		h5->Write();
+// 		h5->GetAsymErrorsGraphX(4)->Write("grx");
+// 		h5->GetAsymErrorsGraphY(4)->Write("gry");
 // 		f->Close();
 // 	}
 }

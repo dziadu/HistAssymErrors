@@ -23,6 +23,9 @@
 #include <TArrayD.h>
 #include <TH2.h>
 
+class TF1;
+class TGraphAsymmErrors;
+
 class TH2DA : public TH2D
 {
 public:
@@ -78,6 +81,9 @@ public:
 	virtual Double_t GetTotalErrorU() const;
 	virtual Double_t GetTotalErrorL() const;
 
+	virtual TGraphAsymmErrors * GetAsymErrorsGraphX(int xcol) const;
+	virtual TGraphAsymmErrors * GetAsymErrorsGraphY(int yrow) const;
+
 	static  TH2DA   *Efficiency(const char * name, const TH2DA * total,  const TH2DA * pass);
 
 	ClassDef(TH2DA,1);
@@ -89,6 +95,8 @@ protected:
 	virtual void     SetBinError(TArrayD & arr, Int_t bin, Double_t error);
 
 	virtual Double_t GetTotalError(const TArrayD & arr) const;
+
+	virtual TGraphAsymmErrors * BuildAsymmErrorsGraph(Size_t points, Double_t *x, Double_t *xe, Double_t *y, Double_t *yl, Double_t *yu) const;
 
 protected:
 	TArrayD fSumw2u;
