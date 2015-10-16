@@ -3,6 +3,7 @@
 #include <TApplication.h>
 #include <TROOT.h>
 #include <TF2.h>
+#include <TFile.h>
 
 #include <TH2DA.h>
 
@@ -154,10 +155,18 @@ void BasicCase::MyTest()
 // 	h3->PrintErrors();
 // 	h4->PrintErrors();
 
-	TH2DA * h5 = TH2DA::Efficiency("h5: eff", h3, h4);
+	TH2DA * h5 = TH2DA::Efficiency("h5_eff", h3, h4);
 	h5->PrintErrors();
 
 	PR(h5->GetTotalErrorU());
 	PR(h5->Integral());
 	PR(h5->GetTotalErrorL());
+
+// 	TFile * f = new TFile("/tmp/test.root", "RECREATE");
+// 	if (f->IsOpen())
+// 	{
+// 		f->cd();
+// 		h5->Write();
+// 		f->Close();
+// 	}
 }

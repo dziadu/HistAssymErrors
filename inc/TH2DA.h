@@ -78,7 +78,9 @@ public:
 	virtual Double_t GetTotalErrorU() const;
 	virtual Double_t GetTotalErrorL() const;
 
-	static TH2DA * Efficiency(const char * name, const TH2DA * total,  const TH2DA * pass);
+	static  TH2DA   *Efficiency(const char * name, const TH2DA * total,  const TH2DA * pass);
+
+	ClassDef(TH2DA,1);
 
 protected:
 	void init();
@@ -92,7 +94,6 @@ protected:
 	TArrayD fSumw2u;
 	TArrayD fSumw2l;
 
-	ClassDef(TH2DA,1);
 };
 
 #endif // TH2DA_H

@@ -34,6 +34,8 @@ class DifferentAxisLimits: public std::exception {};
 class DifferentBinLimits: public std::exception {};
 class DifferentLabels: public std::exception {};
 
+// ClassImp(TH2DA)
+
 TH2DA::TH2DA() : TH2D()
 {
 	init();
@@ -912,4 +914,3 @@ Double_t TH2DA::GetTotalError(const TArrayD& arr) const
 
 	return TMath::Sqrt(total_err);
 }
-
