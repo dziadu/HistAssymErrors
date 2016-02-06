@@ -46,6 +46,7 @@ link_directories(${ROOT_LIBRARIES_DIR})
 ROOT_STANDARD_LIBRARY_PACKAGE(HistAsymmErrors DEPENDENCIES ${ROOT_LIBRARIES})
 
 # add_subdirectory(examples)
+enable_testing()
 add_subdirectory(tests)
 
 # Export the package for use from the build-tree

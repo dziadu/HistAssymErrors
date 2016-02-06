@@ -84,6 +84,9 @@ public:
 	virtual TGraphAsymmErrors * GetAsymErrorsGraphX(int xcol) const;
 	virtual TGraphAsymmErrors * GetAsymErrorsGraphY(int yrow) const;
 
+	virtual TGraphAsymmErrors * ErrorsProjectionX(int sta, int sto) const;
+	virtual TGraphAsymmErrors * ErrorsProjectionY(int sta, int sto) const;
+
 	static  TH2DA   *Efficiency(const char * name, const TH2DA * total,  const TH2DA * pass);
 
 	ClassDef(TH2DA,1);
@@ -97,6 +100,8 @@ protected:
 	virtual Double_t GetTotalError(const TArrayD & arr) const;
 
 	virtual TGraphAsymmErrors * BuildAsymmErrorsGraph(Size_t points, Double_t *x, Double_t *xe, Double_t *y, Double_t *yl, Double_t *yu) const;
+
+	virtual TGraphAsymmErrors * BuildErrorsProjection(bool use_xaxis, int sta, int sto) const;
 
 protected:
 	TArrayD fSumw2u;

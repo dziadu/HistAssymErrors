@@ -966,6 +966,12 @@ TGraphAsymmErrors * TH2DA::GetAsymErrorsGraphY(int yrow) const
 	TAxis * ax = this->GetXaxis();
 	int xnum = ax->GetNbins();
 
+	if (yrow < 0)
+		yrow = 0;
+
+	if (yrow >= this->GetYaxis()->GetNbins())
+		yrow = this->GetYaxis()->GetNbins()-1;
+
 	Double_t * x = new Double_t[xnum];
 	Double_t * xe = new Double_t[xnum];
 	Double_t * y = new Double_t[xnum];
@@ -991,4 +997,97 @@ TGraphAsymmErrors * TH2DA::GetAsymErrorsGraphY(int yrow) const
 	delete [] yl;
 
 	return graph;
+}
+
+TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int sto) const
+{
+	TAxis * axis_proj = nullptr;
+	TAxis * axis_norm = nullptr;
+
+	int i = 0;
+	int j = 0;
+
+	int * fake_i = nullptr;
+	int * fake_j = nullptr;
+
+	if (use_xaxis)
+	{
+		axis_proj = this->GetXaxis();
+		axis_norm = this->GetYaxis();
+
+		fake_i = &i;
+		fake_j = &j;
+	}
+	else
+	{
+		axis_proj = this->GetYaxis();
+		axis_norm = this->GetXaxis();
+
+		fake_i = &j;
+		fake_j = &i;
+	}
+
+	int xnum = axis_norm->GetNbins();
+	int ynum = axis_proj->GetNbins();
+
+	if (sto < sta)
+	{
+		int temp = sta;
+		sta = sto;
+		sto = temp;
+	}
+
+	if (sta < 0)
+		sta = 0;
+
+	if (sto > ynum+1)
+		sto = ynum+1;
+
+	Double_t * x = new Double_t[xnum];
+	Double_t * xe = new Double_t[xnum];
+	Double_t * y = new Double_t[xnum];
+	Double_t * yu = new Double_t[xnum];
+	Double_t * yl = new Double_t[xnum];
+
+	for (i = 0; i < xnum; ++i)
+	{
+		x[i] = axis_norm->GetBinCenter(i+1);
+		xe[i] = axis_norm->GetBinWidth(i+1)/2.0;
+
+		double tmp_v = 0.0;
+		double tmp_u = 0.0;
+		double tmp_l = 0.0;
+
+		for (j = sta; j < sto; ++j)
+		{
+			Int_t bin = GetBin(*fake_i+1, *fake_j+1);
+			tmp_v += GetBinContent(bin);
+			tmp_u += GetBinErrorU(bin)*GetBinErrorU(bin);
+			tmp_l += GetBinErrorL(bin)*GetBinErrorL(bin);
+		}
+
+		y[i] = tmp_v;
+		yu[i] = sqrt(tmp_u);
+		yl[i] = sqrt(tmp_l);
+	}
+
+	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(xnum, x, xe, y, yl, yu);
+
+	delete [] x;
+	delete [] xe;
+	delete [] y;
+	delete [] yu;
+	delete [] yl;
+
+	return graph;
+}
+
+TGraphAsymmErrors * TH2DA::ErrorsProjectionX(int sta, int sto) const
+{
+	return BuildErrorsProjection(false, sta, sto);
+}
+
+TGraphAsymmErrors * TH2DA::ErrorsProjectionY(int sta, int sto) const
+{
+	return BuildErrorsProjection(true, sta, sto);
 }

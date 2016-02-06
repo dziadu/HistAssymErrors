@@ -8,11 +8,13 @@
 
 #include <TH2DA.h>
 
+#include "test_common.h"
+
 #define PR(x) std::cout << "++DEBUG: " << #x << " = |" << x << "| (" << __FILE__ << ", " << __LINE__ << ")\n";
 
-class BasicCase : public CPPUNIT_NS::TestFixture
+class BasicCase_tests : public CPPUNIT_NS::TestFixture
 {
-	CPPUNIT_TEST_SUITE( BasicCase );
+	CPPUNIT_TEST_SUITE( BasicCase_tests );
 	CPPUNIT_TEST( MyTest );
 	CPPUNIT_TEST_SUITE_END();
 
@@ -26,81 +28,9 @@ protected:
 	TH2D * hd;
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( BasicCase );
+CPPUNIT_TEST_SUITE_REGISTRATION( BasicCase_tests );
 
-void fill_random(TH2 * h)
-{
-	int xnum = h->GetXaxis()->GetNbins();
-	int ynum = h->GetYaxis()->GetNbins();
-
-	for (int i = 1; i <= xnum; ++i)
-	{
-		for (int j = 1; j <= ynum; ++j)
-		{
-			h->Fill(h->GetXaxis()->GetBinCenter(i), h->GetYaxis()->GetBinCenter(j), rand() % 1000);
-		}
-	}
-}
-
-void fill_flat(TH2 * h)
-{
-	int xnum = h->GetXaxis()->GetNbins();
-	int ynum = h->GetYaxis()->GetNbins();
-
-	for (int i = 1; i <= xnum; ++i)
-	{
-		for (int j = 1; j <= ynum; ++j)
-		{
-			h->Fill(h->GetXaxis()->GetBinCenter(i), h->GetYaxis()->GetBinCenter(j), ynum*xnum);
-		}
-	}
-}
-
-void fill_rising(TH2 * h)
-{
-	int xnum = h->GetXaxis()->GetNbins();
-	int ynum = h->GetYaxis()->GetNbins();
-
-	for (int j = 1; j <= ynum; ++j)
-	{
-		for (int i = 1; i <= xnum; ++i)
-		{
-			h->Fill(h->GetXaxis()->GetBinCenter(i), h->GetYaxis()->GetBinCenter(j), (j-1)*xnum + i-1);
-		}
-	}
-}
-
-void PrintErrors(TH2D * h)
-{
-	int xnum = h->GetXaxis()->GetNbins();
-	int ynum = h->GetYaxis()->GetNbins();
-
-	printf("\t");
-	for (int i = 1; i <= xnum; ++i)
-	{
-		printf("%d\t", i-1);
-	}
-	printf("\n\n");
-
-	for (int j = 1; j <= ynum; ++j)
-	{
-		printf("%d:\t", j-1);
-
-		for (int i = 1; i <= xnum; ++i)
-		{
-			printf("%g\t", h->GetBinError(i, j));
-		}
-		printf("\n\t");
-		for (int i = 1; i <= xnum; ++i)
-		{
-			printf("%g\t", h->GetBinContent(i, j));
-		}
-		printf("\n");
-	}
-	printf("\n\n");
-}
-
-void BasicCase::setUp()
+void BasicCase_tests::setUp()
 {
 	h = new TH2DA("h", "h", 10, -5, 5, 10, -5, 5);
 	fill_random(h);
@@ -111,7 +41,7 @@ void BasicCase::setUp()
 	fill_random(hd);
 }
 
-void BasicCase::MyTest()
+void BasicCase_tests::MyTest()
 {
 	float fnum = 2.00001f;
 // 	CPPUNIT_FAIL("zxczc");

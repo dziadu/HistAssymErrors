@@ -3,19 +3,19 @@ find_package(cppunit)
 
 file(GLOB UnitTests_SRCS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*_tests.cpp" )
 
-add_executable(UnitTester test_runner.cpp ${UnitTests_SRCS})
+link_directories(${CMAKE_CURRENT_BINARY_DIR}/lib)
+
+add_executable(UnitTester test_runner.cpp test_common.cpp ${UnitTests_SRCS})
 target_link_libraries(UnitTester HistAsymmErrors ${CPPUNIT_LIBRARIES})
 
 foreach(test ${UnitTests_SRCS})
 	get_filename_component(TestName ${test} NAME_WE)
-	add_test(${TestName} UnitTester ${TestName})
+	message(STATUS "Adding test ${TestName}")
+	add_test(${TestName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/UnitTester ${TestName})
 endforeach(test)
 
-enable_testing()
-add_test(NAME "BasicCase" COMMAND UnitTester)
-
-add_custom_command(TARGET MainTest
-	POST_BUILD
-	COMMAND ctest --output-on-failure)
-
-add_custom_target(MainTest ALL UnitTester)
+# add_custom_command(TARGET MainTest
+# 	POST_BUILD
+# 	COMMAND ctest --output-on-failure)
+# 
+# add_custom_target(MainTest ALL UnitTester)
