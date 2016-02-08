@@ -84,23 +84,23 @@ TH2DA::~TH2DA()
 void TH2DA::Copy(TObject& obj) const
 {
 	TH2D::Copy(obj);
-	((TH2DA&)obj).fSumw2u = fSumw2u;
+	((TH2DA&)obj).fSumw2h = fSumw2h;
 	((TH2DA&)obj).fSumw2l = fSumw2l;
 }
 
 void TH2DA::init()
 {
 	Sumw2();
-	fSumw2u.Set(fNcells);
+	fSumw2h.Set(fNcells);
 	fSumw2l.Set(fNcells);
 }
 
 
-Double_t TH2DA::GetBinErrorU(Int_t bin) const
+Double_t TH2DA::GetBinErrorH(Int_t bin) const
 {
 	if (bin < 0) bin = 0;
 	if (bin >= fNcells) bin = fNcells-1;
-	if (fSumw2u.fN) return TMath::Sqrt(fSumw2u.fArray[bin]);
+	if (fSumw2h.fN) return TMath::Sqrt(fSumw2h.fArray[bin]);
 
 	return GetBinError(bin);
 }
@@ -117,27 +117,27 @@ Double_t TH2DA::GetBinErrorL(Int_t bin) const
 void TH2DA::SetBinError(Int_t binx, Int_t biny, Double_t error)
 {
 	int bin = GetBin(binx,biny);
-	SetBinError(fSumw2u, bin, error);
+	SetBinError(fSumw2h, bin, error);
 	SetBinError(fSumw2l, bin, error);
 }
 
 void TH2DA::SetBinError(Int_t binx, Int_t biny, Double_t error_u, Double_t error_l)
 {
 	int bin = GetBin(binx,biny);
-	SetBinError(fSumw2u, bin, error_u);
+	SetBinError(fSumw2h, bin, error_u);
 	SetBinError(fSumw2l, bin, error_l);
 }
 
 void TH2DA::SetBinError(Int_t binx, Int_t biny, Int_t binz, Double_t error)
 {
 	int bin = GetBin(binx,biny,binz);
-	SetBinError(fSumw2u, bin, error);
+	SetBinError(fSumw2h, bin, error);
 	SetBinError(fSumw2l, bin, error);
 }
 
-void TH2DA::SetBinErrorU(Int_t bin, Double_t error)
+void TH2DA::SetBinErrorH(Int_t bin, Double_t error)
 {
-	SetBinError(fSumw2u, bin, error);
+	SetBinError(fSumw2h, bin, error);
 }
 
 void TH2DA::SetBinErrorL(Int_t bin, Double_t error)
@@ -145,9 +145,9 @@ void TH2DA::SetBinErrorL(Int_t bin, Double_t error)
 	SetBinError(fSumw2l, bin, error);
 }
 
-void TH2DA::SetBinErrorU(Int_t binx, Int_t biny, Double_t error_u)
+void TH2DA::SetBinErrorH(Int_t binx, Int_t biny, Double_t error_u)
 {
-	SetBinError(fSumw2u, GetBin(binx, biny), error_u);
+	SetBinError(fSumw2h, GetBin(binx, biny), error_u);
 }
 
 void TH2DA::SetBinErrorL(Int_t binx, Int_t biny, Double_t error_l)
@@ -157,36 +157,36 @@ void TH2DA::SetBinErrorL(Int_t binx, Int_t biny, Double_t error_l)
 
 void TH2DA::PrintErrors()
 {
-	int xnum = this->GetXaxis()->GetNbins();
-	int ynum = this->GetYaxis()->GetNbins();
+	int n_num = this->GetXaxis()->GetNbins();
+	int p_num = this->GetYaxis()->GetNbins();
 
 	printf("\t");
-	for (int i = 1; i <= xnum; ++i)
+	for (int i = 1; i <= n_num; ++i)
 	{
 		printf("%10d\t", i-1);
 	}
 	printf("\n\n");
 
-	for (int j = 1; j <= ynum; ++j)
+	for (int j = 1; j <= p_num; ++j)
 	{
 		printf("%d:\t", j-1);
 
-		for (int i = 1; i <= xnum; ++i)
+		for (int i = 1; i <= n_num; ++i)
 		{
-			printf("%10g\t", GetBinErrorU(i, j));
+			printf("%10g\t", GetBinErrorH(i, j));
 		}
 		printf("\n\t");
-		for (int i = 1; i <= xnum; ++i)
+		for (int i = 1; i <= n_num; ++i)
 		{
 			printf("%10g\t", GetBinContent(i, j));
 		}
 		printf("\n\t");
-		for (int i = 1; i <= xnum; ++i)
+		for (int i = 1; i <= n_num; ++i)
 		{
 			printf("%10g\t", GetBinErrorL(i, j));
 		}
 		printf("\n\t");
-		for (int i = 1; i <= xnum; ++i)
+		for (int i = 1; i <= n_num; ++i)
 		{
 			printf("%10g\t", GetBinError(i, j));
 		}
@@ -203,7 +203,7 @@ Int_t TH2DA::Fill(Double_t x, Double_t y)
 	bin = GetBin(binx,biny);
 
 	TH2D::Fill(x, y);
-	++fSumw2u[bin];
+	++fSumw2h[bin];
 	++fSumw2l[bin];
 
 	return bin;
@@ -217,7 +217,7 @@ Int_t TH2DA::Fill(Double_t x, Double_t y, Double_t w)
 	bin = GetBin(binx,biny);
 
 	TH2D::Fill(x, y, w);
-	fSumw2u[bin] += w*w;
+	fSumw2h[bin] += w*w;
 	fSumw2l[bin] += w*w;
 
 	return bin;
@@ -227,15 +227,15 @@ void TH2DA::Scale(Double_t c1, Option_t * option)
 {
 	TH2D::Scale(c1, option);
 
-	int xnum = this->GetXaxis()->GetNbins();
-	int ynum = this->GetYaxis()->GetNbins();
+	int n_num = this->GetXaxis()->GetNbins();
+	int p_num = this->GetYaxis()->GetNbins();
 
-	for (int i = 1; i <= xnum; ++i)
+	for (int i = 1; i <= n_num; ++i)
 	{
-		for (int j = 1; j <= ynum; ++j)
+		for (int j = 1; j <= p_num; ++j)
 		{
 			int bin = GetBin(i,j);
-			fSumw2u[bin] *= c1*c1;
+			fSumw2h[bin] *= c1*c1;
 			fSumw2l[bin] *= c1*c1;
 		}
 	}
@@ -301,7 +301,7 @@ Bool_t TH2DA::Divide(TF1 *f1, Double_t c1)
 				TF1::RejectPoint(kFALSE);
 				bin = binx +(nbinsx+2)*(biny + (nbinsy+2)*binz);
 				Double_t error1 = GetBinError(bin);
-				Double_t error1u = GetBinErrorU(bin);
+				Double_t error1u = GetBinErrorH(bin);
 				Double_t error1l = GetBinErrorL(bin);
 				cu  = c1*f1->EvalPar(xx);
 				if (TF1::RejectedPoint()) continue;
@@ -313,13 +313,13 @@ Bool_t TH2DA::Divide(TF1 *f1, Double_t c1)
 					if (cu != 0)
 					{
 						fSumw2.fArray[bin] = error1*error1/(cu*cu);
-						fSumw2u.fArray[bin] = error1u*error1u/(cu*cu);
+						fSumw2h.fArray[bin] = error1u*error1u/(cu*cu);
 						fSumw2l.fArray[bin] = error1l*error1l/(cu*cu);
 					}
 					else
 					{
 						fSumw2.fArray[bin] = 0;
-						fSumw2u.fArray[bin] = 0;
+						fSumw2h.fArray[bin] = 0;
 						fSumw2l.fArray[bin] = 0;
 					}
 				}
@@ -392,14 +392,14 @@ Bool_t TH2DA::Divide(const TH1 *h1)
 					Double_t e0 = GetBinError(bin);
 					Double_t e1 = h1->GetBinError(bin);
 
-					Double_t e0u = GetBinErrorU(bin);
+					Double_t e0u = GetBinErrorH(bin);
 					Double_t e0l = GetBinErrorL(bin);
 
 					Double_t e1u = 0.;
 					Double_t e1l = 0.;
 					if (is_assymetric)
 					{
-						e1u = ((TH2DA*)h1)->GetBinErrorU(bin);
+						e1u = ((TH2DA*)h1)->GetBinErrorH(bin);
 						e1l = ((TH2DA*)h1)->GetBinErrorL(bin);
 					}
 					else
@@ -412,12 +412,12 @@ Bool_t TH2DA::Divide(const TH1 *h1)
 					if (!c1)
 					{
 						fSumw2.fArray[bin] = 0;
-						fSumw2u.fArray[bin] = 0;
+						fSumw2h.fArray[bin] = 0;
 						fSumw2l.fArray[bin] = 0;
 						continue;
 					}
 					fSumw2.fArray[bin] = (e0*e0*c1*c1 + e1*e1*c0*c0)/(c12*c12);
-					fSumw2u.fArray[bin] = (e0u*e0u*c1*c1 + e1u*e1u*c0*c0)/(c12*c12);
+					fSumw2h.fArray[bin] = (e0u*e0u*c1*c1 + e1u*e1u*c0*c0)/(c12*c12);
 					fSumw2l.fArray[bin] = (e0l*e0l*c1*c1 + e1l*e1l*c0*c0)/(c12*c12);
 				}
 			}
@@ -511,7 +511,7 @@ Bool_t TH2DA::Divide(const TH1 *h1, const TH1 *h2, Double_t c1, Double_t c2, Opt
 
 					if (is_assymetric1)
 					{
-						e1u = ((TH2DA*)h1)->GetBinErrorU(bin);
+						e1u = ((TH2DA*)h1)->GetBinErrorH(bin);
 						e1l = ((TH2DA*)h1)->GetBinErrorL(bin);
 					}
 					else
@@ -522,7 +522,7 @@ Bool_t TH2DA::Divide(const TH1 *h1, const TH1 *h2, Double_t c1, Double_t c2, Opt
 
 					if (is_assymetric2)
 					{
-						e2u = ((TH2DA*)h2)->GetBinErrorU(bin);
+						e2u = ((TH2DA*)h2)->GetBinErrorH(bin);
 						e2l = ((TH2DA*)h2)->GetBinErrorL(bin);
 					}
 					else
@@ -541,18 +541,18 @@ Bool_t TH2DA::Divide(const TH1 *h1, const TH1 *h2, Double_t c1, Double_t c2, Opt
 							//fSumw2.fArray[bin] = TMath::Abs(w*(1-w)/b2);     // old formula from G. Flucke
 							// formula which works also for weighted histogram (see http://root.cern.ch/phpBB2/viewtopic.php?t=3753 )
 							fSumw2.fArray[bin] = TMath::Abs( ( (1.-2.*w)*e1*e1 + w*w*e2*e2 )/(b2*b2) );
-							fSumw2u.fArray[bin] = TMath::Abs( ( (1.-2.*w)*e1u*e1u + w*w*e2u*e2u )/(b2*b2) );
+							fSumw2h.fArray[bin] = TMath::Abs( ( (1.-2.*w)*e1u*e1u + w*w*e2u*e2u )/(b2*b2) );
 							fSumw2l.fArray[bin] = TMath::Abs( ( (1.-2.*w)*e1l*e1l + w*w*e2l*e2l )/(b2*b2) );
 						} else {
 							//in case b1=b2 error is zero
 							//use  TGraphAsymmErrors::BayesDivide for getting the asymmetric error not equal to zero
 							fSumw2.fArray[bin] = 0;
-							fSumw2u.fArray[bin] = 0;
+							fSumw2h.fArray[bin] = 0;
 							fSumw2l.fArray[bin] = 0;
 						}
 					} else {
 						fSumw2.fArray[bin] = d1*d2*(e1*e1*b2*b2 + e2*e2*b1*b1)/(b22*b22);
-						fSumw2u.fArray[bin] = d1*d2*(e1u*e1u*b2*b2 + e2u*e2u*b1*b1)/(b22*b22);
+						fSumw2h.fArray[bin] = d1*d2*(e1u*e1u*b2*b2 + e2u*e2u*b1*b1)/(b22*b22);
 						fSumw2l.fArray[bin] = d1*d2*(e1l*e1l*b2*b2 + e2l*e2l*b1*b1)/(b22*b22);
 					}
 				}
@@ -611,7 +611,7 @@ Bool_t TH2DA::Multiply(TF1 *f1, Double_t c1)
 				TF1::RejectPoint(kFALSE);
 				bin = binx +(nbinsx+2)*(biny + (nbinsy+2)*binz);
 				Double_t error1 = GetBinError(bin);
-				Double_t error1u = GetBinErrorU(bin);
+				Double_t error1u = GetBinErrorH(bin);
 				Double_t error1l = GetBinErrorL(bin);
 				cu  = c1*f1->EvalPar(xx);
 				if (TF1::RejectedPoint()) continue;
@@ -620,7 +620,7 @@ Bool_t TH2DA::Multiply(TF1 *f1, Double_t c1)
 				if (fSumw2.fN)
 				{
 					fSumw2.fArray[bin] = cu*cu*error1*error1;
-					fSumw2u.fArray[bin] = cu*cu*error1u*error1u;
+					fSumw2h.fArray[bin] = cu*cu*error1u*error1u;
 					fSumw2l.fArray[bin] = cu*cu*error1l*error1l;
 				}
 			}
@@ -691,7 +691,7 @@ Bool_t TH2DA::Multiply(const TH1 *h1)
 					Double_t e0 = GetBinError(bin);
 					Double_t e1 = h1->GetBinError(bin);
 
-					Double_t e0u = GetBinErrorU(bin);
+					Double_t e0u = GetBinErrorH(bin);
 					Double_t e0l = GetBinErrorL(bin);
 
 					Double_t e1u = 0.;
@@ -699,7 +699,7 @@ Bool_t TH2DA::Multiply(const TH1 *h1)
 
 					if (is_assymetric)
 					{
-						e1u = ((TH2DA*)h1)->GetBinErrorU(bin);
+						e1u = ((TH2DA*)h1)->GetBinErrorH(bin);
 						e1l = ((TH2DA*)h1)->GetBinErrorL(bin);
 					}
 					else
@@ -709,7 +709,7 @@ Bool_t TH2DA::Multiply(const TH1 *h1)
 					}
 
 					fSumw2.fArray[bin] = (e0*e0*c1*c1 + e1*e1*c0*c0);
-					fSumw2u.fArray[bin] = (e0u*e0u*c1*c1 + e1u*e1u*c0*c0);
+					fSumw2h.fArray[bin] = (e0u*e0u*c1*c1 + e1u*e1u*c0*c0);
 					fSumw2l.fArray[bin] = (e0l*e0l*c1*c1 + e1l*e1l*c0*c0);
 				}
 			}
@@ -797,7 +797,7 @@ Bool_t TH2DA::Multiply(const TH1 *h1, const TH1 *h2, Double_t c1, Double_t c2, O
 
 					if (is_assymetric1)
 					{
-						e1u = ((TH2DA*)h1)->GetBinErrorU(bin);
+						e1u = ((TH2DA*)h1)->GetBinErrorH(bin);
 						e1l = ((TH2DA*)h1)->GetBinErrorL(bin);
 					}
 					else
@@ -808,7 +808,7 @@ Bool_t TH2DA::Multiply(const TH1 *h1, const TH1 *h2, Double_t c1, Double_t c2, O
 
 					if (is_assymetric2)
 					{
-						e2u = ((TH2DA*)h2)->GetBinErrorU(bin);
+						e2u = ((TH2DA*)h2)->GetBinErrorH(bin);
 						e2l = ((TH2DA*)h2)->GetBinErrorL(bin);
 					}
 					else
@@ -818,7 +818,7 @@ Bool_t TH2DA::Multiply(const TH1 *h1, const TH1 *h2, Double_t c1, Double_t c2, O
 					}
 
 					fSumw2.fArray[bin] = d1*d2*(e1*e1*b2*b2 + e2*e2*b1*b1);
-					fSumw2u.fArray[bin] = d1*d2*(e1u*e1u*b2*b2 + e2u*e2u*b1*b1);
+					fSumw2h.fArray[bin] = d1*d2*(e1u*e1u*b2*b2 + e2u*e2u*b1*b1);
 					fSumw2l.fArray[bin] = d1*d2*(e1l*e1l*b2*b2 + e2l*e2l*b1*b1);
 				}
 			}
@@ -831,7 +831,7 @@ Bool_t TH2DA::Multiply(const TH1 *h1, const TH1 *h2, Double_t c1, Double_t c2, O
 void TH2DA::Reset(Option_t* option)
 {
 	TH2D::Reset(option);
-	fSumw2u.Reset();
+	fSumw2h.Reset();
 	fSumw2l.Reset();
 }
 
@@ -855,12 +855,12 @@ TH2DA * TH2DA::Efficiency(const char * name, const TH2DA* total, const TH2DA* pa
 	TH2DA * heff = (TH2DA *)pass->Clone(name);
 	heff->Reset();
 
-	int xnum = total->GetXaxis()->GetNbins();
-	int ynum = total->GetYaxis()->GetNbins();
+	int n_num = total->GetXaxis()->GetNbins();
+	int p_num = total->GetYaxis()->GetNbins();
 
-	for (int i = 1; i <= xnum; ++i)
+	for (int i = 1; i <= n_num; ++i)
 	{
-		for (int j = 1; j <= ynum; ++j)
+		for (int j = 1; j <= p_num; ++j)
 		{
 			int bin = total->GetBin(i,j);
 
@@ -876,7 +876,7 @@ TH2DA * TH2DA::Efficiency(const char * name, const TH2DA* total, const TH2DA* pa
 
 			heff->SetBinContent(bin, p);
 
-			heff->SetBinErrorU(bin, bUpper - p);
+			heff->SetBinErrorH(bin, bUpper - p);
 			heff->SetBinErrorL(bin, p - bLower);
 
 			Double_t q = 1.0 - p;
@@ -887,9 +887,9 @@ TH2DA * TH2DA::Efficiency(const char * name, const TH2DA* total, const TH2DA* pa
 	return heff;
 }
 
-Double_t TH2DA::GetTotalErrorU() const
+Double_t TH2DA::GetTotalErrorH() const
 {
-	return GetTotalError(fSumw2u);
+	return GetTotalError(fSumw2h);
 }
 
 Double_t TH2DA::GetTotalErrorL() const
@@ -900,12 +900,12 @@ Double_t TH2DA::GetTotalErrorL() const
 Double_t TH2DA::GetTotalError(const TArrayD& arr) const
 {
 	Double_t total_err = 0.0;
-	int xnum = this->GetXaxis()->GetNbins();
-	int ynum = this->GetYaxis()->GetNbins();
+	int n_num = this->GetXaxis()->GetNbins();
+	int p_num = this->GetYaxis()->GetNbins();
 
-	for (int i = 1; i <= xnum; ++i)
+	for (int i = 1; i <= n_num; ++i)
 	{
-		for (int j = 1; j <= ynum; ++j)
+		for (int j = 1; j <= p_num; ++j)
 		{
 			int bin = GetBin(i,j);
 
@@ -929,106 +929,42 @@ TGraphAsymmErrors * TH2DA::BuildAsymmErrorsGraph(Size_t points, Double_t* x, Dou
 	return graph;
 }
 
-TGraphAsymmErrors * TH2DA::GetAsymErrorsGraphX(int xcol) const
-{PR(xcol);
-	TAxis * ax = this->GetYaxis();
-	int ynum = ax->GetNbins();
-
-	Double_t * x = new Double_t[ynum];
-	Double_t * xe = new Double_t[ynum];
-	Double_t * y = new Double_t[ynum];
-	Double_t * yu = new Double_t[ynum];
-	Double_t * yl = new Double_t[ynum];
-
-	for (int i = 0; i < ynum; ++i)
-	{
-		Int_t bin = GetBin(xcol+1, i+1);
-		x[i] = ax->GetBinCenter(i+1);
-		xe[i] = ax->GetBinWidth(i+1)/2.0;
-		y[i] = GetBinContent(bin);
-		yu[i] = GetBinErrorU(bin);
-		yl[i] = GetBinErrorL(bin);
-	}
-
-	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(ynum, x, xe, y, yl, yu);
-
-	delete [] x;
-	delete [] xe;
-	delete [] y;
-	delete [] yu;
-	delete [] yl;
-
-	return graph;
-}
-
-TGraphAsymmErrors * TH2DA::GetAsymErrorsGraphY(int yrow) const
-{
-	TAxis * ax = this->GetXaxis();
-	int xnum = ax->GetNbins();
-
-	if (yrow < 0)
-		yrow = 0;
-
-	if (yrow >= this->GetYaxis()->GetNbins())
-		yrow = this->GetYaxis()->GetNbins()-1;
-
-	Double_t * x = new Double_t[xnum];
-	Double_t * xe = new Double_t[xnum];
-	Double_t * y = new Double_t[xnum];
-	Double_t * yu = new Double_t[xnum];
-	Double_t * yl = new Double_t[xnum];
-
-	for (int i = 0; i < xnum; ++i)
-	{
-		Int_t bin = GetBin(i+1, yrow+1);
-		x[i] = ax->GetBinCenter(i+1);
-		xe[i] = ax->GetBinWidth(i+1)/2.0;
-		y[i] = GetBinContent(bin);
-		yu[i] = GetBinErrorU(bin);
-		yl[i] = GetBinErrorL(bin);
-	}
-
-	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(xnum, x, xe, y, yl, yu);
-
-	delete [] x;
-	delete [] xe;
-	delete [] y;
-	delete [] yu;
-	delete [] yl;
-
-	return graph;
-}
-
 TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int sto) const
 {
+	// proj ection axis, is the one on which sta-storange is evaluated
+	// normal axis the other one
 	TAxis * axis_proj = nullptr;
 	TAxis * axis_norm = nullptr;
 
-	int i = 0;
-	int j = 0;
+	// use this counters in the loop
+	int n = 0;		// iterate over n axis
+	int p = 0;		// iterate over p axis
 
-	int * fake_i = nullptr;
-	int * fake_j = nullptr;
+	// assign axes according to projection (use_xaxis) selection
+	int * real_proj_axis = nullptr;
+	int * real_norm_axis = nullptr;
 
 	if (use_xaxis)
 	{
 		axis_proj = this->GetXaxis();
 		axis_norm = this->GetYaxis();
 
-		fake_i = &i;
-		fake_j = &j;
+		real_proj_axis = &p;
+			real_norm_axis = &n;
 	}
 	else
 	{
 		axis_proj = this->GetYaxis();
 		axis_norm = this->GetXaxis();
 
-		fake_i = &j;
-		fake_j = &i;
+		real_proj_axis = &n;
+		real_norm_axis = &p;
 	}
 
-	int xnum = axis_norm->GetNbins();
-	int ynum = axis_proj->GetNbins();
+	// from now on, work in n-p space, where
+	// n is treated as x-axis and p as y-axis
+	int n_num = axis_norm->GetNbins();
+	int p_num = axis_proj->GetNbins();
 
 	if (sto < sta)
 	{
@@ -1040,38 +976,38 @@ TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int st
 	if (sta < 0)
 		sta = 0;
 
-	if (sto > ynum+1)
-		sto = ynum+1;
+	if (sto > p_num+1)
+		sto = p_num+1;
 
-	Double_t * x = new Double_t[xnum];
-	Double_t * xe = new Double_t[xnum];
-	Double_t * y = new Double_t[xnum];
-	Double_t * yu = new Double_t[xnum];
-	Double_t * yl = new Double_t[xnum];
+	Double_t * x = new Double_t[n_num];
+	Double_t * xe = new Double_t[n_num];
+	Double_t * y = new Double_t[n_num];
+	Double_t * yu = new Double_t[n_num];
+	Double_t * yl = new Double_t[n_num];
 
-	for (i = 0; i < xnum; ++i)
+	for (n = 0; n < n_num; ++n)
 	{
-		x[i] = axis_norm->GetBinCenter(i+1);
-		xe[i] = axis_norm->GetBinWidth(i+1)/2.0;
+		x[n] = axis_norm->GetBinCenter(n+1);
+		xe[n] = axis_norm->GetBinWidth(n+1)/2.0;
 
 		double tmp_v = 0.0;
 		double tmp_u = 0.0;
 		double tmp_l = 0.0;
 
-		for (j = sta; j < sto; ++j)
+		for (p = sta; p < sto; ++p)
 		{
-			Int_t bin = GetBin(*fake_i+1, *fake_j+1);
+			Int_t bin = GetBin(*real_proj_axis+1, *real_norm_axis+1);
 			tmp_v += GetBinContent(bin);
-			tmp_u += GetBinErrorU(bin)*GetBinErrorU(bin);
+			tmp_u += GetBinErrorH(bin)*GetBinErrorH(bin);
 			tmp_l += GetBinErrorL(bin)*GetBinErrorL(bin);
 		}
 
-		y[i] = tmp_v;
-		yu[i] = sqrt(tmp_u);
-		yl[i] = sqrt(tmp_l);
+		y[n] = tmp_v;
+		yu[n] = sqrt(tmp_u);
+		yl[n] = sqrt(tmp_l);
 	}
 
-	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(xnum, x, xe, y, yl, yu);
+	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(n_num, x, xe, y, yl, yu);
 
 	delete [] x;
 	delete [] xe;
@@ -1084,10 +1020,10 @@ TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int st
 
 TGraphAsymmErrors * TH2DA::ErrorsProjectionX(int sta, int sto) const
 {
-	return BuildErrorsProjection(false, sta, sto);
+	return BuildErrorsProjection(true, sta, sto);
 }
 
 TGraphAsymmErrors * TH2DA::ErrorsProjectionY(int sta, int sto) const
 {
-	return BuildErrorsProjection(true, sta, sto);
+	return BuildErrorsProjection(false, sta, sto);
 }

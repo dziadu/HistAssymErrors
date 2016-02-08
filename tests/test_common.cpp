@@ -72,7 +72,7 @@ void fill_default(TH2DA * h)
 		for (uint y = 0; y < y_size; ++y)
 		{
 			h->SetBinContent(x+1, y+1, values[y][x]);
-			h->SetBinErrorU(x+1, y+1, errs_u[y][x]);
+			h->SetBinErrorH(x+1, y+1, errs_u[y][x]);
 			h->SetBinErrorL(x+1, y+1, errs_l[y][x]);
 		}
 	}

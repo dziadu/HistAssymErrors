@@ -66,7 +66,7 @@ void BasicCase_tests::MyTest()
 
 	h2->Divide(h);
 // 	h2->PrintErrors();
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( sqrt(2), h2->GetBinErrorU(1, 1), 0.0005 );
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( sqrt(2), h2->GetBinErrorH(1, 1), 0.0005 );
 	CPPUNIT_ASSERT_DOUBLES_EQUAL( 1.0, h2->GetBinContent(1, 1), 0.0005 );
 
 	TH2D * hd2 = (TH2D*)hd->Clone("new hd");
@@ -93,7 +93,7 @@ void BasicCase_tests::MyTest()
 // 	PR(h5->Integral());
 // 	PR(h5->GetTotalErrorL());
 
-	CPPUNIT_ASSERT_DOUBLES_EQUAL( (h5->GetTotalErrorU() - h5->GetTotalErrorL()) == 0.0, false, 0.0005 );
+	CPPUNIT_ASSERT_DOUBLES_EQUAL( (h5->GetTotalErrorH() - h5->GetTotalErrorL()) == 0.0, false, 0.0005 );
 
 // 	TFile * f = new TFile("/tmp/test.root", "RECREATE");
 // 	if (f->IsOpen())

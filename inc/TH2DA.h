@@ -53,10 +53,10 @@ public:
 	virtual Int_t    Fill(Double_t x, Double_t y);
 	virtual Int_t    Fill(Double_t x, Double_t y, Double_t w);
 
-	virtual Double_t GetBinErrorU(Int_t bin) const;
+	virtual Double_t GetBinErrorH(Int_t bin) const;
 	virtual Double_t GetBinErrorL(Int_t bin) const;
 
-	virtual Double_t GetBinErrorU(Int_t binx, Int_t biny) const { return GetBinErrorU(GetBin(binx, biny)); }
+	virtual Double_t GetBinErrorH(Int_t binx, Int_t biny) const { return GetBinErrorH(GetBin(binx, biny)); }
 	virtual Double_t GetBinErrorL(Int_t binx, Int_t biny) const { return GetBinErrorL(GetBin(binx, biny)); }
 
 	virtual Bool_t   Multiply(TF1 *f1, Double_t c1=1);
@@ -71,21 +71,21 @@ public:
 	virtual void     SetBinError(Int_t binx, Int_t biny, Double_t error_u, Double_t error_l);
 	virtual void     SetBinError(Int_t binx, Int_t biny, Int_t binz, Double_t error);
 	
-	virtual void     SetBinErrorU(Int_t bin, Double_t error);
+	virtual void     SetBinErrorH(Int_t bin, Double_t error);
 	virtual void     SetBinErrorL(Int_t bin, Double_t error);
-	virtual void     SetBinErrorU(Int_t binx, Int_t biny, Double_t error_u);
+	virtual void     SetBinErrorH(Int_t binx, Int_t biny, Double_t error_u);
 	virtual void     SetBinErrorL(Int_t binx, Int_t biny, Double_t error_l);
 
 	virtual void     PrintErrors();
 
-	virtual Double_t GetTotalErrorU() const;
+	virtual Double_t GetTotalErrorH() const;
 	virtual Double_t GetTotalErrorL() const;
-
-	virtual TGraphAsymmErrors * GetAsymErrorsGraphX(int xcol) const;
-	virtual TGraphAsymmErrors * GetAsymErrorsGraphY(int yrow) const;
 
 	virtual TGraphAsymmErrors * ErrorsProjectionX(int sta, int sto) const;
 	virtual TGraphAsymmErrors * ErrorsProjectionY(int sta, int sto) const;
+
+// 	virtual TH2DA * HistProjectionX(int sta, int sto) const;
+// 	virtual TH2DA * HistProjectionY(int sta, int sto) const;
 
 	static  TH2DA   *Efficiency(const char * name, const TH2DA * total,  const TH2DA * pass);
 
@@ -104,7 +104,7 @@ protected:
 	virtual TGraphAsymmErrors * BuildErrorsProjection(bool use_xaxis, int sta, int sto) const;
 
 protected:
-	TArrayD fSumw2u;
+	TArrayD fSumw2h;
 	TArrayD fSumw2l;
 
 };
