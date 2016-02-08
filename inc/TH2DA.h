@@ -65,7 +65,7 @@ public:
 
 	virtual void     Reset(Option_t *option="");
 
-	virtual void     Scale(Double_t c1, Option_t * option);
+	virtual void     Scale(Double_t c1, Option_t * option = "");
 
 	virtual void     SetBinError(Int_t binx, Int_t biny, Double_t error);
 	virtual void     SetBinError(Int_t binx, Int_t biny, Double_t error_u, Double_t error_l);
