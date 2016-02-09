@@ -45,7 +45,7 @@ link_directories(${ROOT_LIBRARIES_DIR})
 ##### make targets
 ROOT_STANDARD_LIBRARY_PACKAGE(HistAsymmErrors DEPENDENCIES ${ROOT_LIBRARIES})
 
-# add_subdirectory(examples)
+add_subdirectory(examples)
 enable_testing()
 add_subdirectory(tests)
 
