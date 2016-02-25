@@ -117,42 +117,44 @@ Double_t TH2DA::GetBinErrorL(Int_t bin) const
 void TH2DA::SetBinError(Int_t binx, Int_t biny, Double_t error)
 {
 	int bin = GetBin(binx,biny);
-	SetBinError(fSumw2h, bin, error);
-	SetBinError(fSumw2l, bin, error);
+	_SetBinError(fSumw2h, bin, error);
+	_SetBinError(fSumw2l, bin, error);
+
+	TH2D::SetBinError(binx, biny, error);
 }
 
 void TH2DA::SetBinError(Int_t binx, Int_t biny, Double_t error_u, Double_t error_l)
 {
 	int bin = GetBin(binx,biny);
-	SetBinError(fSumw2h, bin, error_u);
-	SetBinError(fSumw2l, bin, error_l);
+	_SetBinError(fSumw2h, bin, error_u);
+	_SetBinError(fSumw2l, bin, error_l);
 }
 
 void TH2DA::SetBinError(Int_t binx, Int_t biny, Int_t binz, Double_t error)
 {
 	int bin = GetBin(binx,biny,binz);
-	SetBinError(fSumw2h, bin, error);
-	SetBinError(fSumw2l, bin, error);
+	_SetBinError(fSumw2h, bin, error);
+	_SetBinError(fSumw2l, bin, error);
 }
 
 void TH2DA::SetBinErrorH(Int_t bin, Double_t error)
 {
-	SetBinError(fSumw2h, bin, error);
+	_SetBinError(fSumw2h, bin, error);
 }
 
 void TH2DA::SetBinErrorL(Int_t bin, Double_t error)
 {
-	SetBinError(fSumw2l, bin, error);
+	_SetBinError(fSumw2l, bin, error);
 }
 
 void TH2DA::SetBinErrorH(Int_t binx, Int_t biny, Double_t error_u)
 {
-	SetBinError(fSumw2h, GetBin(binx, biny), error_u);
+	_SetBinError(fSumw2h, GetBin(binx, biny), error_u);
 }
 
 void TH2DA::SetBinErrorL(Int_t binx, Int_t biny, Double_t error_l)
 {
-	SetBinError(fSumw2l, GetBin(binx, biny), error_l);
+	_SetBinError(fSumw2l, GetBin(binx, biny), error_l);
 }
 
 void TH2DA::PrintErrors()
@@ -244,18 +246,82 @@ void TH2DA::Scale(Double_t c1, Option_t * option)
 // ** protected, general functions ** //
 
 Double_t TH2DA::GetBinError(const TArrayD & arr, Int_t bin) const
-{
-	if (bin < 0) bin = 0;
-	if (bin >= fNcells) bin = fNcells-1;
-	if (arr.fN) return TMath::Sqrt(arr.fArray[bin]);
+{PR(1);
+	if (bin < 0) bin = 0;PR(1);
+	if (bin >= fNcells) bin = fNcells-1;PR(1);
+	
+	if (arr.fN) return TMath::Sqrt(arr.fArray[bin]);PR(1);
 
 	return GetBinError(bin);
 }
 
-void TH2DA::SetBinError(TArrayD & arr, Int_t bin, Double_t error)
+void TH2DA::_SetBinError(TArrayD & arr, Int_t bin, Double_t error)
 {
 	if (bin < 0 || bin>= arr.fN) return;
 	arr.fArray[bin] = error * error;
+}
+
+Bool_t TH2DA::Add(const TH1 *h2, Double_t c1)
+{
+	TH1::Add(h2, c1);
+	//   - Loop on bins (including underflows/overflows)
+// 	Int_t bin, binx, biny, binz;
+// 	Double_t c0,c1,w;
+// 	for (binz=0;binz<=nbinsz+1;binz++) {
+// 		for (biny=0;biny<=nbinsy+1;biny++) {
+// 			for (binx=0;binx<=nbinsx+1;binx++) {
+// 				bin = GetBin(binx,biny,binz);
+// 				c0  = GetBinContent(bin);
+// 				c1  = h1->GetBinContent(bin);
+// 				w   = c0*c1;
+// 				SetBinContent(bin,w);
+// 				if (fSumw2.fN)
+// 				{
+// 					Double_t e0 = GetBinError(bin);
+// 					Double_t e1 = h1->GetBinError(bin);
+// 
+// 					Double_t e0u = GetBinErrorH(bin);
+// 					Double_t e0l = GetBinErrorL(bin);
+// 
+// 					Double_t e1u = 0.;
+// 					Double_t e1l = 0.;
+// 
+// 					if (is_assymetric)
+// 					{
+// 						e1u = ((TH2DA*)h1)->GetBinErrorH(bin);
+// 						e1l = ((TH2DA*)h1)->GetBinErrorL(bin);
+// 					}
+// 					else
+// 					{
+// 						e1u = h1->GetBinError(bin);
+// 						e1l = e1u;
+// 					}
+// 
+// 					fSumw2.fArray[bin] = (e0*e0*c1*c1 + e1*e1*c0*c0);
+// 					fSumw2h.fArray[bin] = (e0u*e0u*c1*c1 + e1u*e1u*c0*c0);
+// 					fSumw2l.fArray[bin] = (e0l*e0l*c1*c1 + e1l*e1l*c0*c0);
+// 				}
+// 			}
+// 		}
+// 	}
+// 	ResetStats();
+
+	if (!h2->InheritsFrom("TH2DA"))
+		return kTRUE;
+
+	TH2DA * _h2 = (TH2DA*)h2;
+	for (int i = 0; i < fNcells; ++i)
+	{
+// 		double err_b = fSumw2h.fArray[i];
+// 		double err_p = _h2->GetBinErrorH(i);
+		if (fSumw2h.fN)
+			fSumw2h.fArray[i] += c1*c1 * _h2->GetBinErrorH(i)*_h2->GetBinErrorH(i);
+// 		double err_a = fSumw2h.fArray[i];
+// 		printf("%g ^2 + %g ^2 = %g ^2\n", err_b, err_p, err_a);
+		if (fSumw2l.fN)
+			fSumw2l.fArray[i] += c1*c1 * _h2->GetBinErrorL(i)*_h2->GetBinErrorL(i);
+	}
+	return kTRUE;
 }
 
 Bool_t TH2DA::Divide(TF1 *f1, Double_t c1)
@@ -931,7 +997,7 @@ TGraphAsymmErrors * TH2DA::BuildAsymmErrorsGraph(Size_t points, Double_t* x, Dou
 
 TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int sto) const
 {
-	// proj ection axis, is the one on which sta-storange is evaluated
+	// proj ection axis, is the one on which sta-sto range is evaluated
 	// normal axis the other one
 	TAxis * axis_proj = nullptr;
 	TAxis * axis_norm = nullptr;
@@ -985,16 +1051,14 @@ TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int st
 	Double_t * yu = new Double_t[n_num];
 	Double_t * yl = new Double_t[n_num];
 
+	size_t real_n = 0;
 	for (n = 0; n < n_num; ++n)
 	{
-		x[n] = axis_norm->GetBinCenter(n+1);
-		xe[n] = axis_norm->GetBinWidth(n+1)/2.0;
-
 		double tmp_v = 0.0;
 		double tmp_u = 0.0;
 		double tmp_l = 0.0;
 
-		for (p = sta; p < sto; ++p)
+		for (p = sta; p <= sto; ++p)
 		{
 			Int_t bin = GetBin(*real_proj_axis+1, *real_norm_axis+1);
 			tmp_v += GetBinContent(bin);
@@ -1002,12 +1066,20 @@ TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int st
 			tmp_l += GetBinErrorL(bin)*GetBinErrorL(bin);
 		}
 
-		y[n] = tmp_v;
-		yu[n] = sqrt(tmp_u);
-		yl[n] = sqrt(tmp_l);
+		if (tmp_v == 0.0 and tmp_u == 0.0 and tmp_l == 0.0)
+			continue;
+
+		x[real_n] = axis_norm->GetBinCenter(n+1);
+		xe[real_n] = axis_norm->GetBinWidth(n+1)/2.0;
+
+		y[real_n] = tmp_v;
+		yu[real_n] = sqrt(tmp_u);
+		yl[real_n] = sqrt(tmp_l);
+
+		++real_n;
 	}
 
-	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(n_num, x, xe, y, yl, yu);
+	TGraphAsymmErrors * graph = BuildAsymmErrorsGraph(real_n, x, xe, y, yl, yu);
 
 	delete [] x;
 	delete [] xe;
@@ -1020,10 +1092,10 @@ TGraphAsymmErrors * TH2DA::BuildErrorsProjection(bool use_xaxis, int sta, int st
 
 TGraphAsymmErrors * TH2DA::ErrorsProjectionX(int sta, int sto) const
 {
-	return BuildErrorsProjection(true, sta, sto);
+	return BuildErrorsProjection(false, sta, sto);
 }
 
 TGraphAsymmErrors * TH2DA::ErrorsProjectionY(int sta, int sto) const
 {
-	return BuildErrorsProjection(false, sta, sto);
+	return BuildErrorsProjection(true, sta, sto);
 }

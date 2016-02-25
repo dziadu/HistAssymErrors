@@ -39,12 +39,15 @@ public:
 	TH2DA(const TH2D &h2d);
 	virtual ~TH2DA();
 
+	using TH2D::Add;
 	using TH2D::Fill;
 	using TH2D::GetBinError;
 	using TH2D::SetBinContent;
 	using TH2D::SetBinError;
 
 	virtual void Copy(TObject & obj) const;
+
+	virtual Bool_t   Add(const TH1 *h2, Double_t c1=1);
 
 	virtual Bool_t   Divide(TF1 *f1, Double_t c1=1);
 	virtual Bool_t   Divide(const TH1 *h1);
@@ -95,7 +98,7 @@ protected:
 	void init();
 
 	virtual Double_t GetBinError(const TArrayD & arr, Int_t bin) const;
-	virtual void     SetBinError(TArrayD & arr, Int_t bin, Double_t error);
+	virtual void     _SetBinError(TArrayD & arr, Int_t bin, Double_t error);
 
 	virtual Double_t GetTotalError(const TArrayD & arr) const;
 
