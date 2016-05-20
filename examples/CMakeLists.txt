@@ -1,6 +1,7 @@
 find_package(SmartFactory)
 find_package(HistAsymmErrors)
 
+if (SmartFactory_FOUND)
 include_directories(
 	${SMARTFACTORY_INCLUDE_DIR}
 )
@@ -20,3 +21,8 @@ target_link_libraries(example_multi_read ${ROOT_LIBRARIES} ${SMARTFACTORY_LIBRAR
 
 add_executable(example_display example_display.cpp)
 target_link_libraries(example_display ${ROOT_LIBRARIES} HistAsymmErrors)
+
+endif(SmartFactory_FOUND)
+
+add_executable(example_display2 example_display2.cpp)
+target_link_libraries(example_display2 ${ROOT_LIBRARIES} HistAsymmErrors)

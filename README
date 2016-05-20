@@ -1,0 +1,108 @@
+1. INSTALLATION
+=========================================================
+
+ Installation to default directory (/usr/local)
+
+  git clone https://github.com/dziadu/HistAssymErrors
+  cd HistAssymErrors
+  mkdir build
+  cd build
+  cmake ..
+  sudo make install
+
+ Installation to custom location
+
+  git clone https://github.com/dziadu/HistAssymErrors
+  cd HistAssymErrors
+  mkdir build
+  cd build
+  cmake .. -DCMAKE_INSTALL_DIR=<location>
+  make install
+
+
+2. INFO
+=========================================================
+
+ TH2DA provides the same functionality like TH2D, including standard
+ symmetric bins, which are calculated the same like for TH2D.
+ But some of the function provide additional functionality. When performing
+ arytmethics with TH2DA object (Add, Divide, Multiply), errors 'h' and 'l' are
+ recalculaed separately. Otherwise errors are recalculaed with the single error
+ of the regular object.
+
+	virtual Bool_t   Add(const TH1 *h2, Double_t c1=1);
+	virtual Bool_t   Divide(TF1 *f1, Double_t c1=1);
+	virtual Bool_t   Divide(const TH1 *h1);
+	virtual Bool_t   Divide(const TH1 *h1, const TH1 *h2, Double_t c1=1, Double_t c2=1, Option_t *option="");
+
+	virtual Bool_t   Multiply(TF1 *f1, Double_t c1=1);
+	virtual Bool_t   Multiply(const TH1 *h1);
+	virtual Bool_t   Multiply(const TH1 *h1, const TH1 *h2, Double_t c1=1, Double_t c2=1, Option_t 
+
+ Filling wil lset symetric errors as for TH2D but also assymetric to be equal to
+ symmetric
+	virtual Int_t    Fill(Double_t x, Double_t y);
+	virtual Int_t    Fill(Double_t x, Double_t y, Double_t w);
+
+ Allows to obtain a error value.
+	virtual Double_t GetBinErrorH(Int_t bin) const;
+	virtual Double_t GetBinErrorL(Int_t bin) const;
+
+	virtual Double_t GetBinErrorH(Int_t binx, Int_t biny) const;
+	virtual Double_t GetBinErrorL(Int_t binx, Int_t biny) const;
+
+ Setting the bin sets symmetric and assymetric errors
+
+	virtual void     SetBinError(Int_t binx, Int_t biny, Double_t error);
+
+ Set h and l error, do not touch symmetric error.
+
+	virtual void     SetBinError(Int_t binx, Int_t biny, Double_t error_u, Double_t error_l);
+
+ Set assymetric errors individually
+
+	virtual void     SetBinErrorH(Int_t bin, Double_t error);
+	virtual void     SetBinErrorL(Int_t bin, Double_t error);
+	virtual void     SetBinErrorH(Int_t binx, Int_t biny, Double_t error_u);
+	virtual void     SetBinErrorL(Int_t binx, Int_t biny, Double_t error_l);
+
+ Print errors on screen in the form:
+  upper-error
+  y-value
+  lower-error
+
+	virtual void     PrintErrors();
+
+ Calculates total error (quadratic sum)
+	virtual Double_t GetTotalErrorH() const;
+	virtual Double_t GetTotalErrorL() const;
+
+ Allows to obtain TGraphAsymmErrors of X/Y projection of the quadratic sum of
+ the bins in the range <sta, sto>. Be aware that:
+  h->ProjectionX("name", i, j);
+ but
+  h->ErrorsProjectionX("name", i-1, j-1);
+
+	virtual TGraphAsymmErrors * ErrorsProjectionX(int sta, int sto) const;
+	virtual TGraphAsymmErrors * ErrorsProjectionY(int sta, int sto) const;
+
+ Calculates efficiency matrix with binominal errors, where
+  p == pass
+  p+q == total
+  q == total-pass
+
+	static  TH2DA*   Efficiency(const char * name, const TH2DA * total,  const TH2DA * pass);
+
+	
+3. USAGE
+=========================================================
+
+ Creation is the same like for regular 2D histogram
+
+  #include <TH2DA.h>
+  TH2DA * h = new TH2DA(...);
+
+ Filling the bin content is the same
+
+  h->SetBinContent(...)
+  h->Fill();
