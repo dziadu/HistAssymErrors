@@ -1,5 +1,4 @@
 find_package(SmartFactory)
-find_package(HistAsymmErrors)
 
 if (SmartFactory_FOUND)
 include_directories(

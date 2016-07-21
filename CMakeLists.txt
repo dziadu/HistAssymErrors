@@ -44,7 +44,6 @@ include_directories(${ROOT_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/inc)
 link_directories(${ROOT_LIBRARIES_DIR})
 
 ##### make targets
-# ROOT_STANDARD_LIBRARY_PACKAGE(HistAsymmErrors DEPENDENCIES ${ROOT_LIBRARIES})
 ROOT_GENERATE_DICTIONARY(G__TH2DA TH2DA.h LINKDEF LinkDef.h)
 add_library(HistAsymmErrors SHARED src/TH2DA.cxx G__TH2DA.cxx)
 target_link_libraries(HistAsymmErrors ${ROOT_LIBRARIES})
