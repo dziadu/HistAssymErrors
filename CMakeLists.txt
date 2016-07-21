@@ -43,7 +43,10 @@ include_directories(${ROOT_INCLUDE_DIR} inc)
 link_directories(${ROOT_LIBRARIES_DIR})
 
 ##### make targets
-ROOT_STANDARD_LIBRARY_PACKAGE(HistAsymmErrors DEPENDENCIES ${ROOT_LIBRARIES})
+# ROOT_STANDARD_LIBRARY_PACKAGE(HistAsymmErrors DEPENDENCIES ${ROOT_LIBRARIES})
+ROOT_GENERATE_DICTIONARY(G__TH2DA ${CMAKE_CURRENT_SOURCE_DIR}/inc/TH2DA.h LINKDEF inc/LinkDef.h)
+add_library(HistAsymmErrors SHARED src/TH2DA.cxx G__TH2DA.cxx)
+target_link_libraries(HistAsymmErrors ${ROOT_LIBRARIES})
 
 add_subdirectory(examples)
 enable_testing()
@@ -62,7 +65,7 @@ CMAKE_INSTALL_BINDIR)
 write_basic_package_version_file(${CMAKE_PROJECT_NAME}ConfigVersion.cmake
 	VERSION ${PROJECT_VERSION}
 	COMPATIBILITY SameMajorVersion)
-                                 
+
 install(FILES 
 	${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}Config.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}ConfigVersion.cmake
