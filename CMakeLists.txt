@@ -31,26 +31,27 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 ##### find ROOT
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
+list(APPEND CMAKE_MODULE_PATH $ENV{ROOTSYS}/etc/cmake)
+
 find_package(ROOT QUIET
 	REQUIRED COMPONENTS Core  RIO Net Hist Graf Graf3d Gpad Tree Rint Postscript 
 Matrix Physics MathCore Thread
 	OPTIONAL_COMPONENTS Cling Cint)
 
-include(${ROOT_USE_FILE})
-
+#include(${ROOT_USE_FILE})
 ##### directories
-include_directories(${ROOT_INCLUDE_DIR} inc)
+include_directories(${ROOT_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/inc)
 link_directories(${ROOT_LIBRARIES_DIR})
 
 ##### make targets
 # ROOT_STANDARD_LIBRARY_PACKAGE(HistAsymmErrors DEPENDENCIES ${ROOT_LIBRARIES})
-ROOT_GENERATE_DICTIONARY(G__TH2DA ${CMAKE_CURRENT_SOURCE_DIR}/inc/TH2DA.h LINKDEF inc/LinkDef.h)
+ROOT_GENERATE_DICTIONARY(G__TH2DA TH2DA.h LINKDEF LinkDef.h)
 add_library(HistAsymmErrors SHARED src/TH2DA.cxx G__TH2DA.cxx)
 target_link_libraries(HistAsymmErrors ${ROOT_LIBRARIES})
 
-add_subdirectory(examples)
-enable_testing()
-add_subdirectory(tests)
+#add_subdirectory(examples)
+#enable_testing()
+#add_subdirectory(tests)
 
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
